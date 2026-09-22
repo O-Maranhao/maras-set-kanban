@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maras-Set-Kanban</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar: project title and button to add a new task -->
+  <header class="board-header">
+    <h1>Maras-Set-Kanban</h1>
+    <button class="new-task-btn">+ New Task</button>
+  </header>
+
+  <!-- Main board: holds the 3 fixed columns -->
+  <main class="board">
+
+    <!-- Column 1: tasks not started yet -->
+    <section class="column" data-column="todo">
+      <div class="column-header">
+        <h2>To Do</h2>
+        <span class="counter">0</span>
+      </div>
+      <div class="task-list">
+
+        <!-- Example card, just to preview the structure. Real cards will be rendered by JS (day 5) -->
+        <article class="task-card" draggable="true">
+          <h3 class="task-title">Example task</h3>
+          <p class="task-description">Optional task description.</p>
+          <div class="task-footer">
+            <span class="badge badge-must">Must</span>
+            <span class="task-date">09/30</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Column 2: tasks in progress -->
+    <section class="column" data-column="doing">
+      <div class="column-header">
+        <h2>Doing</h2>
+        <span class="counter">0</span>
+      </div>
+      <div class="task-list"></div>
+    </section>
+
+    <!-- Column 3: completed tasks -->
+    <section class="column" data-column="done">
+      <div class="column-header">
+        <h2>Done</h2>
+        <span class="counter">0</span>
+      </div>
+      <div class="task-list"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
