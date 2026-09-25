@@ -1,35 +1,66 @@
-/* Maras-Set-Kanban — base styles */
-/* Full styling starts on day 3 (columns) and day 4 (cards) */
+/* ===== Layout: Day 3 ===== */
 
-:root {
-  /* Brand colors */
-  --blue: #0A84FF;
-  --blue-dark: #0040DD;
-  --yellow: #FFDE21;
-  --yellow-dark: #E6C400;
-
-  /* MoSCoW priority colors */
-  --must: #FF453A;
-  --should: var(--yellow);
-  --could: var(--blue);
-  --wont: rgba(255, 255, 255, 0.4);
-
-  /* Border radius */
-  --radius-board: 24px;
-  --radius-column: 20px;
-  --radius-card: 16px;
-  --radius-button: 12px;
-  --radius-badge: 999px;
-
-  /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  margin: 24px;
+  border-radius: var(--radius-column);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
+.board-header h1 {
   margin: 0;
-  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.new-task-btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-badge);
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.board {
+  display: flex;
+  gap: 24px;
+  margin: 0 24px 24px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-column);
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.column-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.counter {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-badge);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
