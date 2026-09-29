@@ -116,10 +116,8 @@ body {
 
 body {
   background:
-    radial-gradient(ellipse 900px 700px at 15% 20%, rgba(10,132,255,0.35), transparent 60%),
-    radial-gradient(ellipse 800px 600px at 85% 12%, rgba(10,132,255,0.20), transparent 60%),
-    radial-gradient(ellipse 1000px 800px at 50% 105%, rgba(10,132,255,0.22), transparent 65%),
-    #0B0F1A;
+    linear-gradient(180deg, rgba(11, 15, 26, 0.10), rgba(11, 15, 26, 0.75)),
+    url("golden-gate.jpg") center / cover no-repeat fixed;
   color: #ffffff;
   min-height: 100vh;
 }
@@ -130,8 +128,8 @@ body {
     radial-gradient(circle 220px at var(--mx) var(--my), rgba(255, 255, 255, 0.05), transparent 70%),
     rgba(255, 255, 255, 0.10);
   background-attachment: fixed, scroll;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.20);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
@@ -167,11 +165,40 @@ body {
 
 .task-number {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 11px;
+  top: 10px;
+  right: 40px;
+  font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 1);
+}
+
+.task-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.task-card:hover .task-delete-btn {
+  opacity: 1;
+}
+
+.task-delete-btn:hover {
+  background: rgba(255, 69, 58, 0.85);
+  color: #ffffff;
 }
 
 .task-card.drag-over-card {
@@ -261,9 +288,13 @@ body {
   border: none;
   border-radius: var(--radius-column);
   padding: 24px;
-  background: rgba(20, 25, 35, 0.85);
+  background:
+    radial-gradient(circle 220px at var(--mx) var(--my), rgba(255, 255, 255, 0.08), transparent 70%),
+    rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
   color: #ffffff;
   width: 320px;
   margin: 0;
@@ -295,8 +326,8 @@ body {
 
 .task-form-dialog[open]::backdrop {
   background: rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .task-form-dialog.closing {

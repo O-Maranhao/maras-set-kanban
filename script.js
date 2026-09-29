@@ -6,7 +6,9 @@
 // priority (MoSCoW): "must" | "should" | "could" | "wont"
 // dueDate: "YYYY-MM-DD"
 
-let tasks = [
+const STORAGE_KEY = "maras-set-kanban-tasks";
+
+const DEFAULT_TASKS = [
   {
     id: 1,
     title: "Build the task form",
@@ -41,6 +43,17 @@ let tasks = [
   }
 ];
 
+function loadTasks() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : DEFAULT_TASKS;
+}
+
+function saveTasks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+let tasks = loadTasks();
+
 const PRIORITY_LABELS = {
   must: "Must",
   should: "Should",
@@ -68,6 +81,20 @@ function createTaskCard(task, position) {
   number.className = "task-number";
   number.textContent = `${position}`;
   card.appendChild(number);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.className = "task-delete-btn";
+  deleteBtn.textContent = "×";
+  deleteBtn.setAttribute("aria-label", "Delete task");
+
+  deleteBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    tasks = tasks.filter((t) => t.id !== task.id);
+    renderBoard();
+});
+
+    card.appendChild(deleteBtn);
 
   const title = document.createElement("h3");
   title.className = "task-title";
@@ -160,6 +187,8 @@ function renderBoard() {
     });
     counterEl.textContent = columnTasks.length;
   });
+
+  saveTasks();
 }
 
 renderBoard();
