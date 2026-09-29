@@ -14,6 +14,31 @@
     <button class="new-task-btn">+ New Task</button>
   </header>
 
+  <!-- New task form, hidden by default -->
+<dialog class="task-form-dialog">
+  <form class="task-form" method="dialog">
+    <h2>New Task</h2>
+
+    <label for="task-title-input">Title</label>
+    <input type="text" id="task-title-input" required>
+
+    <label for="task-priority-input">Priority (MoSCoW)</label>
+    <select id="task-priority-input">
+      <option value="must">Must</option>
+      <option value="should">Should</option>
+      <option value="could">Could</option>
+      <option value="wont">Won't</option>
+    </select>
+
+    <label for="task-date-input">Due date</label>
+    <input type="date" id="task-date-input" required>
+
+    <div class="task-form-actions">
+      <button type="button" class="task-form-cancel">Cancel</button>
+      <button type="submit" class="task-form-submit">Add Task</button>
+    </div>
+  </form>
+</dialog>
   <!-- Main board: holds the 3 fixed columns -->
   <main class="board">
 

@@ -118,3 +118,54 @@ document.addEventListener("mousemove", (event) => {
   document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
   document.documentElement.style.setProperty("--my", `${event.clientY}px`);
 });
+
+// ===== New task form: Day 6 =====
+
+const newTaskBtn = document.querySelector(".new-task-btn");
+const taskFormDialog = document.querySelector(".task-form-dialog");
+const taskForm = document.querySelector(".task-form");
+const cancelBtn = document.querySelector(".task-form-cancel");
+const titleInput = document.querySelector("#task-title-input");
+const priorityInput = document.querySelector("#task-priority-input");
+const dateInput = document.querySelector("#task-date-input");
+
+newTaskBtn.addEventListener("click", () => {
+  taskForm.reset();
+
+  const btnRect = newTaskBtn.getBoundingClientRect();
+  taskFormDialog.style.position = "fixed";
+  taskFormDialog.style.top = `${btnRect.bottom + 12}px`;
+  taskFormDialog.style.left = `${btnRect.right - 320}px`;
+
+  taskFormDialog.showModal();
+});
+
+function closeDialogAnimated() {
+  taskFormDialog.classList.add("closing");
+
+  taskFormDialog.addEventListener("transitionend", () => {
+    taskFormDialog.classList.remove("closing");
+    taskFormDialog.close();
+  }, { once: true });
+}
+
+cancelBtn.addEventListener("click", () => {
+  closeDialogAnimated();
+});
+
+taskForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const newTask = {
+    id: Date.now(),
+    title: titleInput.value,
+    description: "",
+    column: "todo",
+    priority: priorityInput.value,
+    dueDate: dateInput.value
+  };
+
+  tasks.push(newTask);
+  renderBoard();
+  closeDialogAnimated();
+});

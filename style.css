@@ -227,3 +227,121 @@ body {
   color: #FF453A;
   font-weight: 600;
 }
+
+/* ===== Task form: Day 6 ===== */
+
+.task-form-dialog {
+  border: none;
+  border-radius: var(--radius-column);
+  padding: 24px;
+  background: rgba(20, 25, 35, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: #ffffff;
+  width: 320px;
+  margin: 0;
+
+  opacity: 0;
+  transform: scale(0.85);
+  transform-origin: top right;
+  transition: opacity 0.25s ease, transform 0.25s ease, overlay 0.25s ease allow-discrete, display 0.25s ease allow-discrete;
+}
+
+.task-form-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@starting-style {
+  .task-form-dialog[open] {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.task-form-dialog::backdrop {
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: background 0.25s ease, backdrop-filter 0.25s ease, overlay 0.25s ease allow-discrete, display 0.25s ease allow-discrete;
+}
+
+.task-form-dialog[open]::backdrop {
+  background: rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.task-form-dialog.closing {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+.task-form-dialog.closing::backdrop {
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+}
+
+@starting-style {
+  .task-form-dialog[open]::backdrop {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-form h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.task-form label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.task-form input,
+.task-form select {
+  padding: 8px 10px;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.task-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.task-form-actions button {
+  padding: 8px 16px;
+  border-radius: var(--radius-badge);
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-form-cancel {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.task-form-submit {
+  background: rgba(255, 222, 33, 0.20);
+  border: 1px solid rgba(255, 222, 33, 0.55);
+  color: #FFDE21;
+}
