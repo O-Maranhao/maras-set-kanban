@@ -1,3 +1,39 @@
+/* Maras-Set-Kanban — base styles */
+
+:root {
+  /* Brand colors */
+  --blue: #0A84FF;
+  --blue-dark: #0040DD;
+  --yellow: #FFDE21;
+  --yellow-dark: #E6C400;
+
+  /* MoSCoW priority colors */
+  --must: #FF453A;
+  --should: var(--yellow);
+  --could: var(--blue);
+  --wont: rgba(255, 255, 255, 0.4);
+
+  /* Border radius */
+  --radius-board: 24px;
+  --radius-column: 20px;
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-badge: 999px;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+}
+
+
 /* ===== Layout: Day 3 ===== */
 
 .board-header {
@@ -63,4 +99,114 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* ===== Background & glass panels: Day 4 ===== */
+
+body {
+  background:
+    radial-gradient(ellipse 900px 700px at 15% 20%, rgba(10,132,255,0.35), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 85% 12%, rgba(10,132,255,0.20), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 50% 105%, rgba(10,132,255,0.22), transparent 65%),
+    #0B0F1A;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.board-header,
+.column {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.new-task-btn {
+  background: rgba(255, 222, 33, 0.20);
+  border: 1px solid rgba(255, 222, 33, 0.55);
+  color: #FFDE21;
+}
+
+.counter {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== Cards: Day 4 ===== */
+
+.task-card {
+  padding: 16px;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  cursor: grab;
+}
+
+.task-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.task-description {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.task-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* MoSCoW badges */
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 3px 10px;
+  border-radius: var(--radius-badge);
+}
+
+.badge-must {
+  background: rgba(255, 69, 58, 0.22);
+  color: #FF453A;
+}
+
+.badge-should {
+  background: rgba(255, 222, 33, 0.22);
+  color: #FFDE21;
+}
+
+.badge-could {
+  background: rgba(10, 132, 255, 0.22);
+  color: #0A84FF;
+}
+
+.badge-wont {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Overdue state — a class the JS will add later (day 11) */
+.task-card.overdue {
+  background: rgba(255, 69, 58, 0.14);
+  border-color: rgba(255, 69, 58, 0.45);
+}
+
+.task-card.overdue .task-date {
+  color: #FF453A;
+  font-weight: 600;
 }
