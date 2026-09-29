@@ -90,6 +90,16 @@ function createTaskCard(task) {
   footer.appendChild(date);
 
   card.appendChild(footer);
+  
+card.addEventListener("dragstart", (event) => {
+    event.dataTransfer.setData("text/plain", task.id);
+    card.classList.add("dragging");
+});
+
+card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+});
+
   return card;
 }
 
@@ -168,4 +178,22 @@ taskForm.addEventListener("submit", (event) => {
   tasks.push(newTask);
   renderBoard();
   closeDialogAnimated();
+});
+
+// ===== Drag and drop: Day 7 =====
+
+document.querySelectorAll(".column").forEach((column) => {
+  column.addEventListener("dragover", (event) => {
+    event.preventDefault(); // required to allow dropping
+    column.classList.add("drag-over");
+  });
+
+  column.addEventListener("dragleave", () => {
+    column.classList.remove("drag-over");
+  });
+
+  column.addEventListener("drop", (event) => {
+    event.preventDefault();
+    column.classList.remove("drag-over");
+  });
 });
