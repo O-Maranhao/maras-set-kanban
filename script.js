@@ -58,11 +58,16 @@ function formatDate(isoDate) {
   return `${day}/${month} (${weekday})`;
 }
 
-function createTaskCard(task) {
+function createTaskCard(task, position) {
   const card = document.createElement("article");
   card.className = "task-card";
   card.draggable = true;
   card.dataset.id = task.id;
+
+  const number = document.createElement("span");
+  number.className = "task-number";
+  number.textContent = `${position}`;
+  card.appendChild(number);
 
   const title = document.createElement("h3");
   title.className = "task-title";
@@ -90,15 +95,49 @@ function createTaskCard(task) {
   footer.appendChild(date);
 
   card.appendChild(footer);
-  
-card.addEventListener("dragstart", (event) => {
+
+  card.addEventListener("dragstart", (event) => {
     event.dataTransfer.setData("text/plain", task.id);
     card.classList.add("dragging");
-});
+  });
 
-card.addEventListener("dragend", () => {
+  card.addEventListener("dragend", () => {
     card.classList.remove("dragging");
-});
+  });
+
+  // Reordering: dropping one card on top of another
+  card.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    card.classList.add("drag-over-card");
+  });
+
+  card.addEventListener("dragleave", () => {
+    card.classList.remove("drag-over-card");
+  });
+
+  card.addEventListener("drop", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    card.classList.remove("drag-over-card");
+
+    const draggedId = Number(event.dataTransfer.getData("text/plain"));
+    if (draggedId === task.id) return;
+
+    const draggedIndex = tasks.findIndex((t) => t.id === draggedId);
+    const [draggedTask] = tasks.splice(draggedIndex, 1);
+
+    const rect = card.getBoundingClientRect();
+    const dropAfter = event.clientY > rect.top + rect.height / 2;
+
+    const targetIndex = tasks.findIndex((t) => t.id === task.id);
+    const insertAt = dropAfter ? targetIndex + 1 : targetIndex;
+
+    draggedTask.column = task.column;
+    tasks.splice(insertAt, 0, draggedTask);
+
+    renderBoard();
+  });
 
   return card;
 }
@@ -116,7 +155,9 @@ function renderBoard() {
     const columnTasks = tasks.filter((task) => task.column === columnName);
 
     listEl.innerHTML = "";
-    columnTasks.forEach((task) => listEl.appendChild(createTaskCard(task)));
+    columnTasks.forEach((task, index) => {
+      listEl.appendChild(createTaskCard(task, index + 1));
+    });
     counterEl.textContent = columnTasks.length;
   });
 }
@@ -180,11 +221,11 @@ taskForm.addEventListener("submit", (event) => {
   closeDialogAnimated();
 });
 
-// ===== Drag and drop: Day 7 =====
+// ===== Drag and drop: Day 7 & 8=====
 
 document.querySelectorAll(".column").forEach((column) => {
   column.addEventListener("dragover", (event) => {
-    event.preventDefault(); // required to allow dropping
+    event.preventDefault();
     column.classList.add("drag-over");
   });
 
@@ -195,5 +236,17 @@ document.querySelectorAll(".column").forEach((column) => {
   column.addEventListener("drop", (event) => {
     event.preventDefault();
     column.classList.remove("drag-over");
+
+    const taskId = Number(event.dataTransfer.getData("text/plain"));
+    const targetColumn = column.dataset.column;
+
+    const taskIndex = tasks.findIndex((t) => t.id === taskId);
+    if (taskIndex === -1) return;
+
+    const [task] = tasks.splice(taskIndex, 1);
+    task.column = targetColumn;
+    tasks.push(task);
+
+    renderBoard();
   });
 });

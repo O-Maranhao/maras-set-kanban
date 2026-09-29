@@ -4,8 +4,10 @@
   /* Brand colors */
   --blue: #0A84FF;
   --blue-dark: #0040DD;
-  --yellow: #FFDE21;
+  --yellow: #FFD60A;
   --yellow-dark: #E6C400;
+  --system-yellow: #FFD60A;
+  --system-green: #30D158;
 
   /* MoSCoW priority colors */
   --must: #FF453A;
@@ -63,6 +65,9 @@ body {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  background: rgba(255, 214, 10, 0.85);
+  border: 1px solid rgba(255, 214, 10, 0.55);
+  color: #1C1C1E;
 }
 
 .board {
@@ -103,6 +108,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+  min-height: 60px;
 }
 
 /* ===== Background & glass panels: Day 4 ===== */
@@ -155,6 +162,20 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
   cursor: grab;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.task-number {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 1);
+}
+
+.task-card.drag-over-card {
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .task-card:hover {
@@ -198,23 +219,23 @@ body {
 }
 
 .badge-must {
-  background: rgba(255, 69, 58, 0.22);
-  color: #FF453A;
+  background: rgba(255, 69, 58, 0.85);
+  color: #ffffff;
 }
 
 .badge-should {
-  background: rgba(255, 222, 33, 0.22);
-  color: #FFDE21;
+  background: rgba(255, 214, 10, 0.85);
+  color: #1C1C1E;
 }
 
 .badge-could {
-  background: rgba(10, 132, 255, 0.22);
-  color: #0A84FF;
+  background: rgba(10, 132, 255, 0.85);
+  color: #ffffff;
 }
 
 .badge-wont {
   background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* Overdue state — a class the JS will add later (day 11) */
@@ -226,6 +247,12 @@ body {
 .task-card.overdue .task-date {
   color: #FF453A;
   font-weight: 600;
+}
+
+/* Done state — signals completion */
+.column[data-column="done"] .task-card {
+  background: rgba(48, 209, 88, 0.14);
+  border-color: rgba(48, 209, 88, 0.45);
 }
 
 /* ===== Task form: Day 6 ===== */
@@ -341,9 +368,9 @@ body {
 }
 
 .task-form-submit {
-  background: rgba(255, 222, 33, 0.20);
-  border: 1px solid rgba(255, 222, 33, 0.55);
-  color: #FFDE21;
+  background: rgba(255, 214, 10, 0.85);
+  border: 1px solid rgba(255, 214, 10, 0.55);
+  color: #1C1C1E;
 }
 
 /* ===== Drag and drop: Day 7 ===== */
