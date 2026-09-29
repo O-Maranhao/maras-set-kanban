@@ -82,7 +82,7 @@ function createTaskCard(task, position) {
   number.textContent = `${position}`;
   card.appendChild(number);
 
-  const deleteBtn = document.createElement("button");
+const deleteBtn = document.createElement("button");
   deleteBtn.type = "button";
   deleteBtn.className = "task-delete-btn";
   deleteBtn.textContent = "×";
@@ -92,6 +92,24 @@ function createTaskCard(task, position) {
     event.stopPropagation();
     tasks = tasks.filter((t) => t.id !== task.id);
     renderBoard();
+  });
+
+  card.appendChild(deleteBtn);
+
+  card.addEventListener("click", () => {
+  editingTaskId = task.id;
+  titleInput.value = task.title;
+  priorityInput.value = task.priority;
+  dateInput.value = task.dueDate;
+  dialogTitle.textContent = "Edit Task";
+  taskFormSubmitBtn.textContent = "Save Changes";
+
+const cardRect = card.getBoundingClientRect();
+  taskFormDialog.style.position = "fixed";
+  taskFormDialog.style.top = `${cardRect.top}px`;
+  taskFormDialog.style.left = `${cardRect.right + 16}px`;
+
+  taskFormDialog.showModal();
 });
 
     card.appendChild(deleteBtn);
@@ -208,9 +226,16 @@ const cancelBtn = document.querySelector(".task-form-cancel");
 const titleInput = document.querySelector("#task-title-input");
 const priorityInput = document.querySelector("#task-priority-input");
 const dateInput = document.querySelector("#task-date-input");
+const dialogTitle = document.querySelector(".task-form h2");
+const taskFormSubmitBtn = document.querySelector(".task-form-submit");
+
+let editingTaskId = null;
 
 newTaskBtn.addEventListener("click", () => {
+  editingTaskId = null;
   taskForm.reset();
+  dialogTitle.textContent = "New Task";
+  taskFormSubmitBtn.textContent = "Add Task";
 
   const btnRect = newTaskBtn.getBoundingClientRect();
   taskFormDialog.style.position = "fixed";
@@ -236,16 +261,25 @@ cancelBtn.addEventListener("click", () => {
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const newTask = {
-    id: Date.now(),
-    title: titleInput.value,
-    description: "",
-    column: "todo",
-    priority: priorityInput.value,
-    dueDate: dateInput.value
-  };
+  if (editingTaskId !== null) {
+    const task = tasks.find((t) => t.id === editingTaskId);
+    if (task) {
+      task.title = titleInput.value;
+      task.priority = priorityInput.value;
+      task.dueDate = dateInput.value;
+    }
+  } else {
+    const newTask = {
+      id: Date.now(),
+      title: titleInput.value,
+      description: "",
+      column: "todo",
+      priority: priorityInput.value,
+      dueDate: dateInput.value
+    };
+    tasks.push(newTask);
+  }
 
-  tasks.push(newTask);
   renderBoard();
   closeDialogAnimated();
 });
