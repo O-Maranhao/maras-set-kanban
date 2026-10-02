@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Listar arquivos do projeto
+        run: ls -la
+
+      - name: Verificar pipeline
+        run: echo "Pipeline executada com sucesso!"
+
+      - name: Empacotar arquivos do projeto como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: kanban-site-do-maras
+          path: |
+            index.html
+            style.css
+            script.js
