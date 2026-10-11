@@ -54,6 +54,8 @@ function saveTasks() {
 
 let tasks = loadTasks();
 
+let activeFilter = "all";
+
 const PRIORITY_LABELS = {
   must: "Must",
   should: "Should",
@@ -71,11 +73,23 @@ function formatDate(isoDate) {
   return `${day}/${month} (${weekday})`;
 }
 
+function isOverdue(task) {
+  if (task.column === "done") return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(task.dueDate + "T00:00:00");
+  return due < today;
+}
+
 function createTaskCard(task, position) {
   const card = document.createElement("article");
   card.className = "task-card";
   card.draggable = true;
   card.dataset.id = task.id;
+
+  if (isOverdue(task)) {
+    card.classList.add("overdue");
+  }
 
   const number = document.createElement("span");
   number.className = "task-number";
@@ -197,7 +211,9 @@ function renderBoard() {
     const listEl = columnEl.querySelector(".task-list");
     const counterEl = columnEl.querySelector(".counter");
 
-    const columnTasks = tasks.filter((task) => task.column === columnName);
+    const columnTasks = tasks.filter(
+      (task) => task.column === columnName && (activeFilter === "all" || task.priority === activeFilter)
+    );
 
     listEl.innerHTML = "";
     columnTasks.forEach((task, index) => {
@@ -309,6 +325,17 @@ document.querySelectorAll(".column").forEach((column) => {
     const [task] = tasks.splice(taskIndex, 1);
     task.column = targetColumn;
     tasks.push(task);
+
+    renderBoard();
+  });
+});
+
+document.querySelectorAll(".filter-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    activeFilter = btn.dataset.filter;
+
+    document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
 
     renderBoard();
   });
