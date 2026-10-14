@@ -44,8 +44,12 @@ const DEFAULT_TASKS = [
 ];
 
 function loadTasks() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : DEFAULT_TASKS;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_TASKS;
+  } catch {
+    return DEFAULT_TASKS;
+  }
 }
 
 function saveTasks() {
@@ -56,6 +60,9 @@ let tasks = loadTasks();
 
 let activeFilter = "all";
 
+// Id of the task being edited, or null when the form creates a new task
+let editingTaskId = null;
+
 const PRIORITY_LABELS = {
   must: "Must",
   should: "Should",
@@ -63,9 +70,22 @@ const PRIORITY_LABELS = {
   wont: "Won't"
 };
 
+// ===== DOM references =====
+
+const newTaskBtn = document.querySelector(".new-task-btn");
+const taskFormDialog = document.querySelector(".task-form-dialog");
+const taskForm = document.querySelector(".task-form");
+const cancelBtn = document.querySelector(".task-form-cancel");
+const titleInput = document.querySelector("#task-title-input");
+const priorityInput = document.querySelector("#task-priority-input");
+const dateInput = document.querySelector("#task-date-input");
+const dialogTitle = document.querySelector(".task-form h2");
+const taskFormSubmitBtn = document.querySelector(".task-form-submit");
+
 // ===== Helpers =====
 
 function formatDate(isoDate) {
+  if (!isoDate) return "No date";
   const date = new Date(isoDate + "T00:00:00");
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
   const day = String(date.getDate()).padStart(2, "0");
@@ -74,7 +94,7 @@ function formatDate(isoDate) {
 }
 
 function isOverdue(task) {
-  if (task.column === "done") return false;
+  if (task.column === "done" || !task.dueDate) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const due = new Date(task.dueDate + "T00:00:00");
@@ -96,7 +116,7 @@ function createTaskCard(task, position) {
   number.textContent = `${position}`;
   card.appendChild(number);
 
-const deleteBtn = document.createElement("button");
+  const deleteBtn = document.createElement("button");
   deleteBtn.type = "button";
   deleteBtn.className = "task-delete-btn";
   deleteBtn.textContent = "×";
@@ -110,6 +130,7 @@ const deleteBtn = document.createElement("button");
 
   card.appendChild(deleteBtn);
 
+  // Clicking the card opens the form pre-filled for editing
   card.addEventListener("click", () => {
     editingTaskId = task.id;
     titleInput.value = task.title;
@@ -178,6 +199,7 @@ const deleteBtn = document.createElement("button");
     if (draggedId === task.id) return;
 
     const draggedIndex = tasks.findIndex((t) => t.id === draggedId);
+    if (draggedIndex === -1) return;
     const [draggedTask] = tasks.splice(draggedIndex, 1);
 
     const rect = card.getBoundingClientRect();
@@ -222,25 +244,15 @@ function renderBoard() {
 renderBoard();
 
 // ===== Cursor light effect for glass panels =====
+
 document.addEventListener("mousemove", (event) => {
   document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
   document.documentElement.style.setProperty("--my", `${event.clientY}px`);
 });
 
-// ===== New task form: Day 6 =====
+// ===== Task form (create and edit) =====
 
-const newTaskBtn = document.querySelector(".new-task-btn");
-const taskFormDialog = document.querySelector(".task-form-dialog");
-const taskForm = document.querySelector(".task-form");
-const cancelBtn = document.querySelector(".task-form-cancel");
-const titleInput = document.querySelector("#task-title-input");
-const priorityInput = document.querySelector("#task-priority-input");
-const dateInput = document.querySelector("#task-date-input");
-const dialogTitle = document.querySelector(".task-form h2");
-const taskFormSubmitBtn = document.querySelector(".task-form-submit");
-
-let editingTaskId = null;
-
+// Opens the dialog at (left, top), then pushes it back inside the viewport
 function placeDialog(left, top) {
   taskFormDialog.style.position = "fixed";
   taskFormDialog.style.left = `${left}px`;
@@ -262,7 +274,6 @@ newTaskBtn.addEventListener("click", () => {
 
   const btnRect = newTaskBtn.getBoundingClientRect();
   placeDialog(btnRect.right - 320, btnRect.bottom + 12);
-  
 });
 
 function closeDialogAnimated() {
@@ -281,17 +292,20 @@ cancelBtn.addEventListener("click", () => {
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  const title = titleInput.value.trim();
+  if (!title) return;
+
   if (editingTaskId !== null) {
     const task = tasks.find((t) => t.id === editingTaskId);
     if (task) {
-      task.title = titleInput.value;
+      task.title = title;
       task.priority = priorityInput.value;
       task.dueDate = dateInput.value;
     }
   } else {
     const newTask = {
       id: Date.now(),
-      title: titleInput.value,
+      title: title,
       description: "",
       column: "todo",
       priority: priorityInput.value,
@@ -304,7 +318,7 @@ taskForm.addEventListener("submit", (event) => {
   closeDialogAnimated();
 });
 
-// ===== Drag and drop: Day 7 & 8=====
+// ===== Drag and drop between columns =====
 
 document.querySelectorAll(".column").forEach((column) => {
   column.addEventListener("dragover", (event) => {
@@ -333,6 +347,8 @@ document.querySelectorAll(".column").forEach((column) => {
     renderBoard();
   });
 });
+
+// ===== Filters =====
 
 document.querySelectorAll(".filter-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
