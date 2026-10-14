@@ -296,7 +296,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.20);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
   color: #ffffff;
-  width: 320px;
+  width: min(320px, calc(100vw - 32px));
   margin: 0;
 
   opacity: 0;
@@ -443,4 +443,54 @@ body {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
+}
+
+/* ===== Responsive: Day 12 ===== */
+
+@media (max-width: 900px) {
+  .board-header {
+    margin: 16px;
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .board-header h1 {
+    font-size: 20px;
+  }
+
+  .filter-bar {
+    margin: 0 16px 16px;
+    flex-wrap: wrap;
+  }
+
+  .board {
+    flex-direction: column;
+    margin: 0 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .board-header h1 {
+    font-size: 17px;
+  }
+
+  .new-task-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .column {
+    padding: 16px;
+  }
+}
+
+/* Touch screens have no hover: keep the delete button visible */
+@media (hover: none) {
+  .task-delete-btn {
+    opacity: 1;
+  }
+
+  .task-card:hover {
+    transform: none;
+  }
 }

@@ -111,22 +111,16 @@ const deleteBtn = document.createElement("button");
   card.appendChild(deleteBtn);
 
   card.addEventListener("click", () => {
-  editingTaskId = task.id;
-  titleInput.value = task.title;
-  priorityInput.value = task.priority;
-  dateInput.value = task.dueDate;
-  dialogTitle.textContent = "Edit Task";
-  taskFormSubmitBtn.textContent = "Save Changes";
+    editingTaskId = task.id;
+    titleInput.value = task.title;
+    priorityInput.value = task.priority;
+    dateInput.value = task.dueDate;
+    dialogTitle.textContent = "Edit Task";
+    taskFormSubmitBtn.textContent = "Save Changes";
 
-const cardRect = card.getBoundingClientRect();
-  taskFormDialog.style.position = "fixed";
-  taskFormDialog.style.top = `${cardRect.top}px`;
-  taskFormDialog.style.left = `${cardRect.right + 16}px`;
-
-  taskFormDialog.showModal();
-});
-
-    card.appendChild(deleteBtn);
+    const cardRect = card.getBoundingClientRect();
+    placeDialog(cardRect.right + 16, cardRect.top);
+  });
 
   const title = document.createElement("h3");
   title.className = "task-title";
@@ -247,6 +241,19 @@ const taskFormSubmitBtn = document.querySelector(".task-form-submit");
 
 let editingTaskId = null;
 
+function placeDialog(left, top) {
+  taskFormDialog.style.position = "fixed";
+  taskFormDialog.style.left = `${left}px`;
+  taskFormDialog.style.top = `${top}px`;
+  taskFormDialog.showModal();
+
+  const margin = 16;
+  const maxLeft = window.innerWidth - taskFormDialog.offsetWidth - margin;
+  const maxTop = window.innerHeight - taskFormDialog.offsetHeight - margin;
+  taskFormDialog.style.left = `${Math.max(margin, Math.min(left, maxLeft))}px`;
+  taskFormDialog.style.top = `${Math.max(margin, Math.min(top, maxTop))}px`;
+}
+
 newTaskBtn.addEventListener("click", () => {
   editingTaskId = null;
   taskForm.reset();
@@ -254,11 +261,8 @@ newTaskBtn.addEventListener("click", () => {
   taskFormSubmitBtn.textContent = "Add Task";
 
   const btnRect = newTaskBtn.getBoundingClientRect();
-  taskFormDialog.style.position = "fixed";
-  taskFormDialog.style.top = `${btnRect.bottom + 12}px`;
-  taskFormDialog.style.left = `${btnRect.right - 320}px`;
-
-  taskFormDialog.showModal();
+  placeDialog(btnRect.right - 320, btnRect.bottom + 12);
+  
 });
 
 function closeDialogAnimated() {
