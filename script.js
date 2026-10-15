@@ -60,6 +60,10 @@ let tasks = loadTasks();
 
 let activeFilter = "all";
 
+// Ids of cards that should play the enter animation on the next render
+const animateIds = new Set();
+let isFirstRender = true;
+
 // Id of the task being edited, or null when the form creates a new task
 let editingTaskId = null;
 
@@ -124,8 +128,11 @@ function createTaskCard(task, position) {
 
   deleteBtn.addEventListener("click", (event) => {
     event.stopPropagation();
-    tasks = tasks.filter((t) => t.id !== task.id);
-    renderBoard();
+    card.classList.add("card-leaving");
+    setTimeout(() => {
+      tasks = tasks.filter((t) => t.id !== task.id);
+      renderBoard();
+    }, 200);
   });
 
   card.appendChild(deleteBtn);
@@ -210,6 +217,7 @@ function createTaskCard(task, position) {
 
     draggedTask.column = task.column;
     tasks.splice(insertAt, 0, draggedTask);
+    animateIds.add(draggedTask.id);
 
     renderBoard();
   });
@@ -233,10 +241,21 @@ function renderBoard() {
 
     listEl.innerHTML = "";
     columnTasks.forEach((task, index) => {
-      listEl.appendChild(createTaskCard(task, index + 1));
+      const card = createTaskCard(task, index + 1);
+      if (animateIds.has(task.id)) card.classList.add("card-enter");
+      listEl.appendChild(card);
     });
+
+    if (!isFirstRender && Number(counterEl.textContent) !== columnTasks.length) {
+      counterEl.classList.remove("bump");
+      void counterEl.offsetWidth; // restart the animation
+      counterEl.classList.add("bump");
+    }
     counterEl.textContent = columnTasks.length;
   });
+
+  animateIds.clear();
+  isFirstRender = false;
 
   saveTasks();
 }
@@ -312,6 +331,7 @@ taskForm.addEventListener("submit", (event) => {
       dueDate: dateInput.value
     };
     tasks.push(newTask);
+    animateIds.add(newTask.id);
   }
 
   renderBoard();
@@ -343,6 +363,7 @@ document.querySelectorAll(".column").forEach((column) => {
     const [task] = tasks.splice(taskIndex, 1);
     task.column = targetColumn;
     tasks.push(task);
+    animateIds.add(task.id);
 
     renderBoard();
   });
@@ -350,13 +371,110 @@ document.querySelectorAll(".column").forEach((column) => {
 
 // ===== Filters =====
 
+// Smoothly resizes each column from its old height to the new one
+function animateColumnHeights(oldHeights) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  document.querySelectorAll(".column").forEach((column) => {
+    const oldHeight = oldHeights.get(column);
+    const newHeight = column.getBoundingClientRect().height;
+    if (Math.abs(oldHeight - newHeight) < 1) return;
+
+    column.style.overflow = "hidden";
+    const animation = column.animate(
+      [{ height: `${oldHeight}px` }, { height: `${newHeight}px` }],
+      { duration: 350, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
+    );
+    animation.onfinish = animation.oncancel = () => {
+      column.style.overflow = "";
+    };
+  });
+}
+
+let isFilterAnimating = false;
+
 document.querySelectorAll(".filter-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    activeFilter = btn.dataset.filter;
+    const newFilter = btn.dataset.filter;
+    if (isFilterAnimating || newFilter === activeFilter) return;
+    isFilterAnimating = true;
 
     document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
 
-    renderBoard();
+    const oldHeights = new Map();
+    document.querySelectorAll(".column").forEach((column) => {
+      oldHeights.set(column, column.getBoundingClientRect().height);
+    });
+
+    // Cards on screen now; the ones that don't match the new filter fade out
+    const visibleIds = new Set();
+    document.querySelectorAll(".task-card").forEach((card) => {
+      const id = Number(card.dataset.id);
+      const task = tasks.find((t) => t.id === id);
+      visibleIds.add(id);
+      if (task && newFilter !== "all" && task.priority !== newFilter) {
+        card.classList.add("card-leaving");
+      }
+    });
+
+    // After the fade out: re-render, animate only the cards that were hidden before
+    setTimeout(() => {
+      activeFilter = newFilter;
+      tasks.forEach((t) => {
+        if (!visibleIds.has(t.id)) animateIds.add(t.id);
+      });
+      renderBoard();
+      animateColumnHeights(oldHeights);
+      isFilterAnimating = false;
+    }, 200);
   });
 });
+
+// ===== Theme (light / dark) =====
+// Follows the system appearance until the user picks one with the toggle.
+
+const THEME_KEY = "maras-set-kanban-theme";
+const themeToggleBtn = document.querySelector(".theme-toggle");
+const systemDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeToggleBtn.textContent = "Dark mode";
+  themeToggleBtn.setAttribute("aria-pressed", String(theme === "dark"));
+}
+
+// Switches theme with a soft crossfade. The page stays live the whole time,
+// so the glass blur never disappears. "Reduce motion" switches instantly.
+let themeFadeTimer;
+
+function applyThemeAnimated(theme) {
+  const root = document.documentElement;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    applyTheme(theme);
+    return;
+  }
+
+  root.classList.add("theme-fade");
+  applyTheme(theme);
+  clearTimeout(themeFadeTimer);
+  themeFadeTimer = setTimeout(() => root.classList.remove("theme-fade"), 450);
+}
+
+themeToggleBtn.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyThemeAnimated(next);
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {}
+});
+
+systemDarkQuery.addEventListener("change", (event) => {
+  let hasSavedChoice = false;
+  try {
+    hasSavedChoice = localStorage.getItem(THEME_KEY) !== null;
+  } catch {}
+  if (!hasSavedChoice) applyTheme(event.matches ? "dark" : "light");
+});
+
+applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");

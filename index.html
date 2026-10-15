@@ -4,51 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maras-Set-Kanban</title>
+
+  <!-- Applies the saved theme (or the system one) before the first paint, so there is no flash -->
+  <script>
+    try {
+      const saved = localStorage.getItem("maras-set-kanban-theme");
+      document.documentElement.dataset.theme =
+        saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    } catch {}
+  </script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top bar: project title and button to add a new task -->
+  <!-- Top bar: project title, theme toggle and button to add a new task -->
   <header class="board-header">
     <h1>Maras-Set-Kanban</h1>
-    <button class="new-task-btn">+ New Task</button>
+    <div class="header-actions">
+      <button class="theme-toggle" type="button"></button>
+      <button class="new-task-btn">+ New Task</button>
+    </div>
   </header>
 
-  <!-- New task form, hidden by default -->
-<dialog class="task-form-dialog">
-  <form class="task-form" method="dialog">
-    <h2>New Task</h2>
+  <!-- Task form (create and edit), hidden by default -->
+  <dialog class="task-form-dialog">
+    <form class="task-form" method="dialog">
+      <h2>New Task</h2>
 
-    <label for="task-title-input">Title</label>
-    <input type="text" id="task-title-input" required>
+      <label for="task-title-input">Title</label>
+      <input type="text" id="task-title-input" required>
 
-    <label for="task-priority-input">Priority (MoSCoW)</label>
-    <select id="task-priority-input">
-      <option value="must">Must</option>
-      <option value="should">Should</option>
-      <option value="could">Could</option>
-      <option value="wont">Won't</option>
-    </select>
+      <label for="task-priority-input">Priority (MoSCoW)</label>
+      <select id="task-priority-input">
+        <option value="must">Must</option>
+        <option value="should">Should</option>
+        <option value="could">Could</option>
+        <option value="wont">Won't</option>
+      </select>
 
-    <label for="task-date-input">Due date</label>
-    <input type="date" id="task-date-input" required>
+      <label for="task-date-input">Due date</label>
+      <input type="date" id="task-date-input" required>
 
-    <div class="task-form-actions">
-      <button type="button" class="task-form-cancel">Cancel</button>
-      <button type="submit" class="task-form-submit">Add Task</button>
-    </div>
-  </form>
-</dialog>
+      <div class="task-form-actions">
+        <button type="button" class="task-form-cancel">Cancel</button>
+        <button type="submit" class="task-form-submit">Add Task</button>
+      </div>
+    </form>
+  </dialog>
 
-<div class="filter-bar">
-  <button class="filter-btn active" data-filter="all">All</button>
-  <button class="filter-btn" data-filter="must">Must</button>
-  <button class="filter-btn" data-filter="should">Should</button>
-  <button class="filter-btn" data-filter="could">Could</button>
-  <button class="filter-btn" data-filter="wont">Won't</button>
-</div>
+  <!-- MoSCoW filter -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="must">Must</button>
+    <button class="filter-btn" data-filter="should">Should</button>
+    <button class="filter-btn" data-filter="could">Could</button>
+    <button class="filter-btn" data-filter="wont">Won't</button>
+  </div>
 
-  <!-- Main board: holds the 3 fixed columns -->
+  <!-- Main board: holds the 3 fixed columns. Cards are rendered by script.js -->
   <main class="board">
 
     <!-- Column 1: tasks not started yet -->
@@ -57,19 +71,7 @@
         <h2>To Do</h2>
         <span class="counter">0</span>
       </div>
-      <div class="task-list">
-
-        <!-- Example card, just to preview the structure. Real cards will be rendered by JS (day 5) -->
-        <article class="task-card" draggable="true">
-          <h3 class="task-title">Example task</h3>
-          <p class="task-description">Optional task description.</p>
-          <div class="task-footer">
-            <span class="badge badge-must">Must</span>
-            <span class="task-date">09/30</span>
-          </div>
-        </article>
-
-      </div>
+      <div class="task-list"></div>
     </section>
 
     <!-- Column 2: tasks in progress -->
