@@ -8,47 +8,60 @@
 
 const STORAGE_KEY = "maras-set-kanban-tasks";
 
-const DEFAULT_TASKS = [
-  {
-    id: 1,
-    title: "Build the task form",
-    description: "",
-    column: "todo",
-    priority: "should",
-    dueDate: "2026-10-05"
-  },
-  {
-    id: 2,
-    title: "Drag and drop (part 1)",
-    description: "",
-    column: "todo",
-    priority: "must",
-    dueDate: "2026-10-06"
-  },
-  {
-    id: 3,
-    title: "Style the cards",
-    description: "",
-    column: "doing",
-    priority: "could",
-    dueDate: "2026-09-24"
-  },
-  {
-    id: 4,
-    title: "Project planning",
-    description: "",
-    column: "done",
-    priority: "must",
-    dueDate: "2026-09-21"
-  }
-];
+// Today plus/minus a number of days, as "YYYY-MM-DD" in the visitor's local time
+function dateFromToday(offsetDays) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Example tasks for a first visit. Dates are relative to the day the page is opened.
+function createDefaultTasks() {
+  return [
+    {
+      id: 1,
+      title: "Build the task form",
+      description: "",
+      column: "todo",
+      priority: "should",
+      dueDate: dateFromToday(3)
+    },
+    {
+      id: 2,
+      title: "Drag and drop (part 1)",
+      description: "",
+      column: "todo",
+      priority: "must",
+      dueDate: dateFromToday(1)
+    },
+    {
+      id: 3,
+      title: "Style the cards",
+      description: "",
+      column: "doing",
+      priority: "could",
+      dueDate: dateFromToday(-2)
+    },
+    {
+      id: 4,
+      title: "Project planning",
+      description: "",
+      column: "done",
+      priority: "must",
+      dueDate: dateFromToday(-5)
+    }
+  ];
+}
 
 function loadTasks() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : DEFAULT_TASKS;
+    return saved ? JSON.parse(saved) : createDefaultTasks();
   } catch {
-    return DEFAULT_TASKS;
+    return createDefaultTasks();
   }
 }
 
