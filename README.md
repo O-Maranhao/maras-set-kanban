@@ -17,7 +17,7 @@ Built as a 21-day study project, with the interface inspired by Apple's Human In
 - Due dates, with overdue tasks highlighted
 - Filter the board by priority
 - Light and dark theme: follows the system setting until you pick one with the toggle, and remembers your choice
-- Wallpaper picker: the Golden Gate photo, four gradient presets or your own image, remembered across visits
+- Wallpaper picker: photos from the `Wallpapers` folder, three gradient presets or your own image, remembered across visits
 - Tasks persist in `localStorage`
 - Responsive layout for tablets and phones
 - Smooth animations for new, moved and deleted cards, filter changes and theme switching (disabled when the system asks for reduced motion)
@@ -45,7 +45,9 @@ Then open `http://localhost:8000`.
 index.html      Page structure
 style.css       Layout, glass effect, themes, typography and animations
 script.js       Data model, rendering, drag and drop, filters and theme
-golden-gate.jpg Wallpaper
+wallpapers.js   List of wallpaper images shown in the picker
+golden-gate.jpg Default wallpaper
+Wallpapers/     More wallpaper images
 docs/           Screenshots used in this README
 ```
 
@@ -55,6 +57,11 @@ docs/           Screenshots used in this README
 - **Persistence:** the array is saved to `localStorage` after every render.
 - **Theming:** the theme lives in a `data-theme` attribute on `<html>`. A small inline script applies it before the first paint to avoid a flash.
 - **Design:** type scale, system colors and contrast follow Apple's Human Interface Guidelines.
+
+## Adding wallpapers
+
+Put the `.jpg` in the `Wallpapers` folder and add one line for it to `wallpapers.js`, with the file name exactly as it is on disk.
+Keep images under about 1MB and roughly 1920px wide, so the page stays fast.
 
 ## What I learned
 

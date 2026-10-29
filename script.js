@@ -493,12 +493,34 @@ systemDarkQuery.addEventListener("change", (event) => {
 applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
 // ===== Wallpaper =====
-// Presets are CSS gradients in style.css. Uploads are saved as a JPEG data URL.
+// Images come from wallpapers.js, presets are CSS gradients in style.css.
+// Uploads are saved as a JPEG data URL.
 // The inline script in index.html applies the saved choice before the first paint.
 
 const WALLPAPER_KEY = "maras-set-kanban-wallpaper";
-const WALLPAPER_PRESETS = ["ocean", "sunset", "forest", "graphite"];
+const WALLPAPER_PRESETS = ["sunset", "forest", "graphite"];
 const WALLPAPER_MAX_SIDE = 1920;
+const DEFAULT_WALLPAPER_ID = "golden-gate"; // also the fallback in style.css
+
+// File path as a URL: spaces, accents and other characters are encoded, the name is kept
+function wallpaperUrl(file) {
+  return file.split("/").map(encodeURIComponent).join("/");
+}
+
+// One thumbnail per image, before the gradient presets
+document.querySelector(".wallpaper-options").prepend(...WALLPAPERS.map((wallpaper) => {
+  const option = document.createElement("button");
+  option.type = "button";
+  option.className = "wallpaper-option";
+  option.dataset.wallpaper = wallpaper.id;
+  option.setAttribute("aria-pressed", "false");
+
+  const swatch = document.createElement("span");
+  swatch.className = "wallpaper-swatch";
+  swatch.style.backgroundImage = `url("${wallpaperUrl(wallpaper.file)}")`;
+  option.append(swatch, wallpaper.name);
+  return option;
+}));
 
 const wallpaperToggleBtn = document.querySelector(".wallpaper-toggle");
 const wallpaperDialog = document.querySelector(".wallpaper-dialog");
@@ -510,10 +532,15 @@ const wallpaperResetBtn = document.querySelector(".wallpaper-reset-btn");
 const wallpaperCloseBtn = document.querySelector(".wallpaper-close-btn");
 const wallpaperError = document.querySelector(".wallpaper-error");
 
-// "default", a preset name or "custom"
+function findWallpaper(id) {
+  return WALLPAPERS.find((wallpaper) => wallpaper.id === id);
+}
+
+// An image id, a preset name or "custom"
 function currentWallpaper() {
   const name = document.documentElement.dataset.wallpaper;
-  return name === "custom" || WALLPAPER_PRESETS.includes(name) ? name : "default";
+  const isKnown = name === "custom" || WALLPAPER_PRESETS.includes(name) || findWallpaper(name);
+  return isKnown ? name : DEFAULT_WALLPAPER_ID;
 }
 
 // Marks the selected thumbnail. "Your image" only shows while an upload is in use.
@@ -525,15 +552,20 @@ function updateWallpaperOptions() {
   });
 }
 
-// value: "default", a preset name or an image data URL
+// value: an image id, a preset name or an image data URL
 function applyWallpaper(value) {
   const root = document.documentElement;
+  const image = findWallpaper(value);
+  root.style.removeProperty("--wallpaper");
   if (value.startsWith("data:image/")) {
     root.style.setProperty("--wallpaper-custom", `url("${value}")`);
     root.dataset.wallpaper = "custom";
   } else {
     root.style.removeProperty("--wallpaper-custom");
-    if (WALLPAPER_PRESETS.includes(value)) {
+    if (image && value !== DEFAULT_WALLPAPER_ID) {
+      root.style.setProperty("--wallpaper", `url("${wallpaperUrl(image.file)}")`);
+      root.dataset.wallpaper = value;
+    } else if (WALLPAPER_PRESETS.includes(value)) {
       root.dataset.wallpaper = value;
     } else {
       delete root.dataset.wallpaper;
@@ -545,7 +577,7 @@ function applyWallpaper(value) {
 // Returns false when the browser refuses to store it (e.g. quota exceeded)
 function saveWallpaper(value) {
   try {
-    if (value === "default") {
+    if (value === DEFAULT_WALLPAPER_ID) {
       localStorage.removeItem(WALLPAPER_KEY);
     } else {
       localStorage.setItem(WALLPAPER_KEY, value);
@@ -566,10 +598,37 @@ function hideWallpaperError() {
   wallpaperError.textContent = "";
 }
 
+// Last wallpaper clicked, so a slow image never replaces a newer choice
+let pendingWallpaper = null;
+
+function useDefaultWallpaper() {
+  saveWallpaper(DEFAULT_WALLPAPER_ID);
+  applyWallpaper(DEFAULT_WALLPAPER_ID);
+}
+
 function selectWallpaper(value) {
   hideWallpaperError();
-  saveWallpaper(value);
-  applyWallpaper(value);
+  pendingWallpaper = value;
+  const image = findWallpaper(value);
+  if (!image || value === DEFAULT_WALLPAPER_ID) {
+    saveWallpaper(value);
+    applyWallpaper(value);
+    return;
+  }
+
+  // Load the image first: a missing file falls back to the default, not an empty background
+  const test = new Image();
+  test.onload = () => {
+    if (pendingWallpaper !== value) return;
+    saveWallpaper(value);
+    applyWallpaper(value);
+  };
+  test.onerror = () => {
+    if (pendingWallpaper !== value) return;
+    useDefaultWallpaper();
+    showWallpaperError("Could not load that wallpaper, so the default is back.");
+  };
+  test.src = wallpaperUrl(image.file);
 }
 
 // Reads an image file and scales it down so the longest side fits WALLPAPER_MAX_SIDE
@@ -622,7 +681,7 @@ function openWallpaperDialog() {
   wallpaperDialog.style.top = `${Math.max(margin, Math.min(top, maxTop))}px`;
 
   wallpaperToggleBtn.setAttribute("aria-expanded", "true");
-  wallpaperDialog.querySelector('.wallpaper-option[aria-pressed="true"]').focus();
+  wallpaperDialog.querySelector('.wallpaper-option[aria-pressed="true"]')?.focus();
 }
 
 function closeWallpaperDialog() {
@@ -670,7 +729,7 @@ wallpaperOptions.forEach((option) => {
 });
 
 wallpaperResetBtn.addEventListener("click", () => {
-  selectWallpaper("default");
+  selectWallpaper(DEFAULT_WALLPAPER_ID);
 });
 
 wallpaperUploadBtn.addEventListener("click", () => {
@@ -695,6 +754,7 @@ wallpaperFileInput.addEventListener("change", () => {
         showWallpaperError("This image is too large to save. Try a smaller one.");
         return;
       }
+      pendingWallpaper = null;
       applyWallpaper(dataUrl);
     })
     .catch(() => {
@@ -706,3 +766,13 @@ wallpaperFileInput.addEventListener("change", () => {
 });
 
 updateWallpaperOptions();
+
+// The saved image may have been removed from the folder: fall back to the default
+const savedImage = findWallpaper(currentWallpaper());
+if (savedImage && savedImage.id !== DEFAULT_WALLPAPER_ID) {
+  const test = new Image();
+  test.onerror = () => {
+    if (currentWallpaper() === savedImage.id) useDefaultWallpaper();
+  };
+  test.src = wallpaperUrl(savedImage.file);
+}

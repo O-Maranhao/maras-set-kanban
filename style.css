@@ -813,20 +813,25 @@ body,
 }
 
 /* ===== Wallpaper picker ===== */
-/* script.js and the inline script in index.html set data-wallpaper on <html> */
+/* script.js and the inline script in index.html set data-wallpaper on <html>.
+   Images from wallpapers.js set --wallpaper directly as an inline style. */
 
 :root {
-  --wallpaper-ocean: linear-gradient(135deg, #0A84FF 0%, #001F54 50%, #FFDE21 100%);
   --wallpaper-sunset: linear-gradient(160deg, #2B1055 0%, #A4245C 50%, #F28C38 100%);
   --wallpaper-forest: linear-gradient(160deg, #1E6B4A 0%, #0B3D2E 50%, #04140F 100%);
   --wallpaper-graphite: linear-gradient(160deg, #48484A 0%, #1C1C1E 55%, #000000 100%);
 }
 
-html[data-wallpaper="ocean"] { --wallpaper: var(--wallpaper-ocean); }
 html[data-wallpaper="sunset"] { --wallpaper: var(--wallpaper-sunset); }
 html[data-wallpaper="forest"] { --wallpaper: var(--wallpaper-forest); }
 html[data-wallpaper="graphite"] { --wallpaper: var(--wallpaper-graphite); }
 html[data-wallpaper="custom"] { --wallpaper: var(--wallpaper-custom); }
+
+/* Long lists of wallpapers scroll inside the panel */
+.wallpaper-dialog {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
 
 .wallpaper-dialog h2 {
   margin: 0 0 16px;
@@ -867,8 +872,6 @@ html[data-wallpaper="custom"] { --wallpaper: var(--wallpaper-custom); }
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.wallpaper-option[data-wallpaper="default"] .wallpaper-swatch { background-image: url("golden-gate.jpg"); }
-.wallpaper-option[data-wallpaper="ocean"] .wallpaper-swatch { background-image: var(--wallpaper-ocean); }
 .wallpaper-option[data-wallpaper="sunset"] .wallpaper-swatch { background-image: var(--wallpaper-sunset); }
 .wallpaper-option[data-wallpaper="forest"] .wallpaper-swatch { background-image: var(--wallpaper-forest); }
 .wallpaper-option[data-wallpaper="graphite"] .wallpaper-swatch { background-image: var(--wallpaper-graphite); }

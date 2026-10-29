@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maras-Set-Kanban</title>
 
+  <!-- List of wallpaper images, used by the inline script below and by script.js -->
+  <script src="wallpapers.js"></script>
+
   <!-- Applies the saved theme (or the system one) before the first paint, so there is no flash -->
   <script>
     try {
@@ -13,14 +16,22 @@
         saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     } catch {}
 
-    // Same for the saved wallpaper: a preset name or an uploaded image (data URL)
+    // Same for the saved wallpaper: an id from wallpapers.js, a gradient preset or an uploaded image (data URL).
+    // An unknown value (removed file, old preset) is cleared and the default stays.
     try {
       const wallpaper = localStorage.getItem("maras-set-kanban-wallpaper");
+      const image = WALLPAPERS.find((w) => w.id === wallpaper);
       if (wallpaper && wallpaper.startsWith("data:image/")) {
         document.documentElement.style.setProperty("--wallpaper-custom", `url("${wallpaper}")`);
         document.documentElement.dataset.wallpaper = "custom";
-      } else if (wallpaper) {
+      } else if (image) {
+        const url = image.file.split("/").map(encodeURIComponent).join("/");
+        document.documentElement.style.setProperty("--wallpaper", `url("${url}")`);
+        document.documentElement.dataset.wallpaper = image.id;
+      } else if (["sunset", "forest", "graphite"].includes(wallpaper)) {
         document.documentElement.dataset.wallpaper = wallpaper;
+      } else if (wallpaper) {
+        localStorage.removeItem("maras-set-kanban-wallpaper");
       }
     } catch {}
   </script>
@@ -69,13 +80,8 @@
   <dialog class="wallpaper-dialog" aria-labelledby="wallpaper-dialog-title">
     <h2 id="wallpaper-dialog-title">Wallpaper</h2>
 
+    <!-- Image thumbnails from wallpapers.js are added here by script.js, before the gradients -->
     <div class="wallpaper-options" role="group" aria-label="Wallpapers">
-      <button type="button" class="wallpaper-option" data-wallpaper="default" aria-pressed="false">
-        <span class="wallpaper-swatch"></span>Golden Gate
-      </button>
-      <button type="button" class="wallpaper-option" data-wallpaper="ocean" aria-pressed="false">
-        <span class="wallpaper-swatch"></span>Blue &amp; Yellow
-      </button>
       <button type="button" class="wallpaper-option" data-wallpaper="sunset" aria-pressed="false">
         <span class="wallpaper-swatch"></span>Sunset
       </button>
