@@ -2,7 +2,7 @@
 
 A personal Kanban board built with plain HTML, CSS and JavaScript, no frameworks and no build step. Tasks move through three columns (To Do, Doing, Done), carry a MoSCoW priority and a due date, and are saved in the browser.
 
-Built as a 21-day study project, with the interface inspired by Apple's Human Interface Guidelines and its "Liquid Glass" look.
+Built as a 14-day front-end study project (30 minutes a day), with a 7-day backend phase planned for the future, and with the interface inspired by Apple's Human Interface Guidelines and its "Liquid Glass" look.
 
 ![Maras-Set-Kanban in dark mode](docs/screenshot.png)
 
@@ -77,7 +77,12 @@ The next phase adds a backend:
 
 - Python with FastAPI, SQLModel and SQLite
 - A REST API for tasks, replacing `localStorage`
-- User accounts
+- Deploy of the backend (Render or Railway)
+
+## Future improvements
+
+- A description field in the task form (the data model and cards already support it)
+- A column selector in the edit form, for easier use on touch screens
 
 ## License
 

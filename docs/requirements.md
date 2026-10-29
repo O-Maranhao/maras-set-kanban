@@ -1,74 +1,74 @@
-# Documento de Requisitos — Kanban Board (Projeto de Estudo)
+# Requirements Document: Kanban Board (Study Project)
 
-## 1. Objetivo
-Construir um quadro Kanban simples em HTML, CSS e JavaScript puro, com suporte a data limite e priorização MoSCoW, como prática de estudo ao longo de 14 dias (30 min/dia).
+## 1. Goal
+Build a simple Kanban board in plain HTML, CSS and JavaScript, with due dates and MoSCoW prioritization, as a study exercise over 14 days (30 min/day).
 
-## 2. Estrutura do board
-- 3 colunas fixas: **A Fazer**, **Fazendo**, **Feito**
-- Sem criação/edição/exclusão de colunas
+## 2. Board structure
+- 3 fixed columns: **To Do**, **Doing**, **Done**
+- No creating, editing or deleting columns
 
-## 3. Campos do card (tarefa)
-| Campo | Obrigatório | Observações |
+## 3. Card (task) fields
+| Field | Required | Notes |
 |---|---|---|
-| Título | Sim | Texto curto |
-| Descrição | Não | Texto livre |
-| Prioridade (MoSCoW) | Sim | Must / Should / Could / Won't |
-| Data limite | Sim | Data única |
+| Title | Yes | Short text |
+| Description | No | Free text |
+| Priority (MoSCoW) | Yes | Must / Should / Could / Won't |
+| Due date | Yes | Single date |
 
-## 4. Funcionalidades (ações sobre o card)
-- Criar tarefa
-- Editar tarefa
-- Excluir tarefa
-- Mover tarefa entre colunas (drag and drop)
-- Destaque visual quando a data limite já passou
+## 4. Features (actions on a card)
+- Create task
+- Edit task
+- Delete task
+- Move task between columns (drag and drop)
+- Visual highlight when the due date has passed
 
-## 5. Persistência
-- Dados salvos localmente no navegador (localStorage)
-- Sem backend, sem banco de dados
+## 5. Persistence
+- Data saved locally in the browser (localStorage)
+- No backend, no database
 
-## 6. Fora do escopo (MVP)
-- Login / múltiplos usuários
-- Múltiplos boards
-- Anexos, comentários, subtarefas
-- Notificações
+## 6. Out of scope (MVP)
+- Login / multiple users
+- Multiple boards
+- Attachments, comments, subtasks
+- Notifications
 
-## 7. Stack técnica
+## 7. Tech stack
 
-### Front-end (dias 1-14)
+### Front-end (days 1-14)
 - HTML5
-- CSS3 (flexbox ou grid)
-- JavaScript puro (sem framework)
-- localStorage (persistência)
-- Deploy: GitHub Pages ou Vercel
+- CSS3 (flexbox or grid)
+- Plain JavaScript (no framework)
+- localStorage (persistence)
+- Deploy: GitHub Pages or Vercel
 
-### Back-end (dias 15-21)
+### Back-end (days 15-21)
 - Python + FastAPI
 - SQLModel + SQLite
-- Deploy: Render ou Railway
+- Deploy: Render or Railway
 
-## 8. Cronograma
+## 8. Schedule
 
-### Front-end (14 dias, 30 min/dia)
-1. Planejamento e setup
-2. Estrutura HTML
-3. CSS base das colunas
-4. CSS dos cards
-5. Modelo de dados e renderização (JS)
-6. Formulário de criar tarefa
-7. Drag and drop (parte 1)
-8. Drag and drop (parte 2)
-9. Persistência com localStorage
-10. Editar e excluir tarefas
-11. Destaque de atraso e filtro MoSCoW
-12. Responsividade e ajustes visuais
-13. Revisão geral e refatoração
-14. Deploy, README e retrospectiva
+### Front-end (14 days, 30 min/day)
+1. Planning and setup
+2. HTML structure
+3. Base CSS for the columns
+4. Card CSS
+5. Data model and rendering (JS)
+6. Form to create a task
+7. Drag and drop (part 1)
+8. Drag and drop (part 2)
+9. Persistence with localStorage
+10. Edit and delete tasks
+11. Overdue highlight and MoSCoW filter
+12. Responsiveness and visual adjustments
+13. General review and refactoring
+14. Deploy, README and retrospective
 
-### Back-end (7 dias, 30 min/dia)
-15. Setup do backend (FastAPI + SQLite)
-16. Rotas de leitura e criação
-17. Rotas de atualização e exclusão
-18. Validação e tratamento de erros
-19. Integração front-end com a API
-20. Testes e ajustes de integração
-21. Deploy do backend e retrospectiva final
+### Back-end (7 days, 30 min/day)
+15. Backend setup (FastAPI + SQLite)
+16. Read and create routes
+17. Update and delete routes
+18. Validation and error handling
+19. Front-end integration with the API
+20. Tests and integration adjustments
+21. Backend deploy and final retrospective
