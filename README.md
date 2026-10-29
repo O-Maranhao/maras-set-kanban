@@ -17,6 +17,7 @@ Built as a 21-day study project, with the interface inspired by Apple's Human In
 - Due dates, with overdue tasks highlighted
 - Filter the board by priority
 - Light and dark theme: follows the system setting until you pick one with the toggle, and remembers your choice
+- Wallpaper picker: the Golden Gate photo, four gradient presets or your own image, remembered across visits
 - Tasks persist in `localStorage`
 - Responsive layout for tablets and phones
 - Smooth animations for new, moved and deleted cards, filter changes and theme switching (disabled when the system asks for reduced motion)

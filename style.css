@@ -284,7 +284,8 @@ body {
 
 /* ===== Task form: Day 6 ===== */
 
-.task-form-dialog {
+.task-form-dialog,
+.wallpaper-dialog {
   border: none;
   border-radius: var(--radius-column);
   padding: 24px;
@@ -305,44 +306,51 @@ body {
   transition: opacity 0.25s ease, transform 0.25s ease, overlay 0.25s ease allow-discrete, display 0.25s ease allow-discrete;
 }
 
-.task-form-dialog[open] {
+.task-form-dialog[open],
+.wallpaper-dialog[open] {
   opacity: 1;
   transform: scale(1);
 }
 
 @starting-style {
-  .task-form-dialog[open] {
+  .task-form-dialog[open],
+  .wallpaper-dialog[open] {
     opacity: 0;
     transform: scale(0.85);
   }
 }
 
-.task-form-dialog::backdrop {
+.task-form-dialog::backdrop,
+.wallpaper-dialog::backdrop {
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   transition: background 0.25s ease, backdrop-filter 0.25s ease, overlay 0.25s ease allow-discrete, display 0.25s ease allow-discrete;
 }
 
-.task-form-dialog[open]::backdrop {
+.task-form-dialog[open]::backdrop,
+.wallpaper-dialog[open]::backdrop {
   background: rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 
-.task-form-dialog.closing {
+.task-form-dialog.closing,
+.wallpaper-dialog.closing {
   opacity: 0;
   transform: scale(0.85);
 }
 
-.task-form-dialog.closing::backdrop {
+.task-form-dialog.closing::backdrop,
+.wallpaper-dialog.closing::backdrop {
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
 }
 
 @starting-style {
-  .task-form-dialog[open]::backdrop {
+  .task-form-dialog[open]::backdrop,
+  .wallpaper-dialog[open]::backdrop {
     background: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
@@ -508,7 +516,8 @@ html[data-theme="dark"] {
   gap: 12px;
 }
 
-.theme-toggle {
+.theme-toggle,
+.wallpaper-toggle {
   padding: 8px 16px;
   border-radius: var(--radius-badge);
   border: 1px solid rgba(255, 255, 255, 0.20);
@@ -521,12 +530,14 @@ html[data-theme="dark"] {
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.wallpaper-toggle:hover {
   background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
-.theme-toggle[aria-pressed="true"] {
+.theme-toggle[aria-pressed="true"],
+.wallpaper-toggle[aria-expanded="true"] {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
@@ -581,7 +592,8 @@ html[data-theme="dark"] {
   border-color: rgba(255, 69, 58, 0.50);
 }
 
-[data-theme="dark"] .task-form-dialog {
+[data-theme="dark"] .task-form-dialog,
+[data-theme="dark"] .wallpaper-dialog {
   background: rgba(28, 28, 30, 0.88);
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.50);
@@ -671,6 +683,7 @@ body {
 
 .filter-btn,
 .theme-toggle,
+.wallpaper-toggle,
 .new-task-btn {
   font-size: 15px;
 }
@@ -695,6 +708,7 @@ body {
 
 /* Header buttons never break into several lines */
 .theme-toggle,
+.wallpaper-toggle,
 .new-task-btn {
   white-space: nowrap;
 }
@@ -705,6 +719,7 @@ body {
   }
 
   .theme-toggle,
+  .wallpaper-toggle,
   .new-task-btn {
     font-size: 14px;
     padding: 8px 14px;
@@ -771,7 +786,7 @@ body,
 [data-theme="dark"] body {
   background:
     linear-gradient(180deg, var(--overlay-top), var(--overlay-bottom)),
-    url("golden-gate.jpg") center / cover no-repeat fixed;
+    var(--wallpaper, url("golden-gate.jpg")) center / cover no-repeat fixed;
 }
 
 [data-theme="dark"] body {
@@ -795,4 +810,159 @@ body,
     --overlay-top 0.4s ease,
     --overlay-bottom 0.4s ease,
     color 0.4s ease !important;
+}
+
+/* ===== Wallpaper picker ===== */
+/* script.js and the inline script in index.html set data-wallpaper on <html> */
+
+:root {
+  --wallpaper-ocean: linear-gradient(135deg, #0A84FF 0%, #001F54 50%, #FFDE21 100%);
+  --wallpaper-sunset: linear-gradient(160deg, #2B1055 0%, #A4245C 50%, #F28C38 100%);
+  --wallpaper-forest: linear-gradient(160deg, #1E6B4A 0%, #0B3D2E 50%, #04140F 100%);
+  --wallpaper-graphite: linear-gradient(160deg, #48484A 0%, #1C1C1E 55%, #000000 100%);
+}
+
+html[data-wallpaper="ocean"] { --wallpaper: var(--wallpaper-ocean); }
+html[data-wallpaper="sunset"] { --wallpaper: var(--wallpaper-sunset); }
+html[data-wallpaper="forest"] { --wallpaper: var(--wallpaper-forest); }
+html[data-wallpaper="graphite"] { --wallpaper: var(--wallpaper-graphite); }
+html[data-wallpaper="custom"] { --wallpaper: var(--wallpaper-custom); }
+
+.wallpaper-dialog h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+}
+
+.wallpaper-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.wallpaper-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.wallpaper-option[hidden] {
+  display: none;
+}
+
+.wallpaper-swatch {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.20);
+  background: center / cover no-repeat;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.wallpaper-option[data-wallpaper="default"] .wallpaper-swatch { background-image: url("golden-gate.jpg"); }
+.wallpaper-option[data-wallpaper="ocean"] .wallpaper-swatch { background-image: var(--wallpaper-ocean); }
+.wallpaper-option[data-wallpaper="sunset"] .wallpaper-swatch { background-image: var(--wallpaper-sunset); }
+.wallpaper-option[data-wallpaper="forest"] .wallpaper-swatch { background-image: var(--wallpaper-forest); }
+.wallpaper-option[data-wallpaper="graphite"] .wallpaper-swatch { background-image: var(--wallpaper-graphite); }
+.wallpaper-option[data-wallpaper="custom"] .wallpaper-swatch { background-image: var(--wallpaper-custom); }
+
+.wallpaper-option:hover .wallpaper-swatch {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.wallpaper-option:hover,
+.wallpaper-option[aria-pressed="true"] {
+  color: #ffffff;
+}
+
+/* Selected wallpaper: yellow ring */
+.wallpaper-option[aria-pressed="true"] .wallpaper-swatch {
+  border-color: #FFDE21;
+  box-shadow: 0 0 0 2px #FFDE21, 0 4px 12px rgba(0, 0, 0, 0.20);
+}
+
+.wallpaper-option:focus-visible {
+  outline: none;
+}
+
+.wallpaper-option:focus-visible .wallpaper-swatch {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.wallpaper-upload-btn,
+.wallpaper-actions button {
+  padding: 8px 16px;
+  border-radius: var(--radius-badge);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.wallpaper-upload-btn:hover,
+.wallpaper-actions button:hover {
+  background: rgba(255, 255, 255, 0.20);
+}
+
+.wallpaper-upload-btn {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.wallpaper-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #FF453A;
+}
+
+.wallpaper-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.wallpaper-actions .wallpaper-close-btn,
+.wallpaper-actions .wallpaper-close-btn:hover {
+  background: rgba(255, 214, 10, 0.85);
+  border-color: rgba(255, 214, 10, 0.55);
+  color: #1C1C1E;
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .wallpaper-toggle {
+    padding: 8px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper-dialog,
+  .wallpaper-dialog::backdrop,
+  .wallpaper-swatch {
+    transition: none;
+  }
+
+  .wallpaper-option:hover .wallpaper-swatch {
+    transform: none;
+  }
 }

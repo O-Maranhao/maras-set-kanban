@@ -491,3 +491,218 @@ systemDarkQuery.addEventListener("change", (event) => {
 });
 
 applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+
+// ===== Wallpaper =====
+// Presets are CSS gradients in style.css. Uploads are saved as a JPEG data URL.
+// The inline script in index.html applies the saved choice before the first paint.
+
+const WALLPAPER_KEY = "maras-set-kanban-wallpaper";
+const WALLPAPER_PRESETS = ["ocean", "sunset", "forest", "graphite"];
+const WALLPAPER_MAX_SIDE = 1920;
+
+const wallpaperToggleBtn = document.querySelector(".wallpaper-toggle");
+const wallpaperDialog = document.querySelector(".wallpaper-dialog");
+const wallpaperOptions = document.querySelectorAll(".wallpaper-option");
+const customWallpaperOption = document.querySelector('.wallpaper-option[data-wallpaper="custom"]');
+const wallpaperFileInput = document.querySelector(".wallpaper-file-input");
+const wallpaperUploadBtn = document.querySelector(".wallpaper-upload-btn");
+const wallpaperResetBtn = document.querySelector(".wallpaper-reset-btn");
+const wallpaperCloseBtn = document.querySelector(".wallpaper-close-btn");
+const wallpaperError = document.querySelector(".wallpaper-error");
+
+// "default", a preset name or "custom"
+function currentWallpaper() {
+  const name = document.documentElement.dataset.wallpaper;
+  return name === "custom" || WALLPAPER_PRESETS.includes(name) ? name : "default";
+}
+
+// Marks the selected thumbnail. "Your image" only shows while an upload is in use.
+function updateWallpaperOptions() {
+  const current = currentWallpaper();
+  customWallpaperOption.hidden = current !== "custom";
+  wallpaperOptions.forEach((option) => {
+    option.setAttribute("aria-pressed", String(option.dataset.wallpaper === current));
+  });
+}
+
+// value: "default", a preset name or an image data URL
+function applyWallpaper(value) {
+  const root = document.documentElement;
+  if (value.startsWith("data:image/")) {
+    root.style.setProperty("--wallpaper-custom", `url("${value}")`);
+    root.dataset.wallpaper = "custom";
+  } else {
+    root.style.removeProperty("--wallpaper-custom");
+    if (WALLPAPER_PRESETS.includes(value)) {
+      root.dataset.wallpaper = value;
+    } else {
+      delete root.dataset.wallpaper;
+    }
+  }
+  updateWallpaperOptions();
+}
+
+// Returns false when the browser refuses to store it (e.g. quota exceeded)
+function saveWallpaper(value) {
+  try {
+    if (value === "default") {
+      localStorage.removeItem(WALLPAPER_KEY);
+    } else {
+      localStorage.setItem(WALLPAPER_KEY, value);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function showWallpaperError(message) {
+  wallpaperError.textContent = message;
+  wallpaperError.hidden = false;
+}
+
+function hideWallpaperError() {
+  wallpaperError.hidden = true;
+  wallpaperError.textContent = "";
+}
+
+function selectWallpaper(value) {
+  hideWallpaperError();
+  saveWallpaper(value);
+  applyWallpaper(value);
+}
+
+// Reads an image file and scales it down so the longest side fits WALLPAPER_MAX_SIDE
+function resizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = reject;
+      image.onload = () => {
+        const { naturalWidth: width, naturalHeight: height } = image;
+        if (!width || !height) {
+          reject(new Error("Image has no size"));
+          return;
+        }
+
+        const scale = Math.min(1, WALLPAPER_MAX_SIDE / Math.max(width, height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#000000"; // transparent areas become black, not white
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Opens the panel under the button, then pushes it back inside the viewport
+function openWallpaperDialog() {
+  hideWallpaperError();
+  updateWallpaperOptions();
+
+  const btnRect = wallpaperToggleBtn.getBoundingClientRect();
+  wallpaperDialog.style.position = "fixed";
+  wallpaperDialog.showModal();
+
+  const margin = 16;
+  const left = btnRect.right - wallpaperDialog.offsetWidth;
+  const top = btnRect.bottom + 12;
+  const maxLeft = window.innerWidth - wallpaperDialog.offsetWidth - margin;
+  const maxTop = window.innerHeight - wallpaperDialog.offsetHeight - margin;
+  wallpaperDialog.style.left = `${Math.max(margin, Math.min(left, maxLeft))}px`;
+  wallpaperDialog.style.top = `${Math.max(margin, Math.min(top, maxTop))}px`;
+
+  wallpaperToggleBtn.setAttribute("aria-expanded", "true");
+  wallpaperDialog.querySelector('.wallpaper-option[aria-pressed="true"]').focus();
+}
+
+function closeWallpaperDialog() {
+  if (!wallpaperDialog.open || wallpaperDialog.classList.contains("closing")) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    wallpaperDialog.close();
+    return;
+  }
+
+  wallpaperDialog.classList.add("closing");
+  wallpaperDialog.addEventListener("transitionend", () => {
+    wallpaperDialog.close();
+  }, { once: true });
+}
+
+wallpaperToggleBtn.addEventListener("click", openWallpaperDialog);
+wallpaperCloseBtn.addEventListener("click", closeWallpaperDialog);
+
+// Esc: close with the same animation as the Done button
+wallpaperDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeWallpaperDialog();
+});
+
+// Clicking the backdrop (outside the panel) also closes it
+wallpaperDialog.addEventListener("click", (event) => {
+  if (event.target !== wallpaperDialog) return;
+  const rect = wallpaperDialog.getBoundingClientRect();
+  const inside = event.clientX >= rect.left && event.clientX <= rect.right &&
+    event.clientY >= rect.top && event.clientY <= rect.bottom;
+  if (!inside) closeWallpaperDialog();
+});
+
+wallpaperDialog.addEventListener("close", () => {
+  wallpaperDialog.classList.remove("closing");
+  wallpaperToggleBtn.setAttribute("aria-expanded", "false");
+});
+
+wallpaperOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    if (option.dataset.wallpaper === "custom") return;
+    selectWallpaper(option.dataset.wallpaper);
+  });
+});
+
+wallpaperResetBtn.addEventListener("click", () => {
+  selectWallpaper("default");
+});
+
+wallpaperUploadBtn.addEventListener("click", () => {
+  wallpaperFileInput.click();
+});
+
+wallpaperFileInput.addEventListener("change", () => {
+  const file = wallpaperFileInput.files[0];
+  wallpaperFileInput.value = ""; // lets the same file be picked again
+  if (!file) return;
+
+  hideWallpaperError();
+  if (!file.type.startsWith("image/")) {
+    showWallpaperError("That file is not an image. Choose a JPEG, PNG or WebP file.");
+    return;
+  }
+
+  wallpaperUploadBtn.disabled = true;
+  resizeImage(file)
+    .then((dataUrl) => {
+      if (!saveWallpaper(dataUrl)) {
+        showWallpaperError("This image is too large to save. Try a smaller one.");
+        return;
+      }
+      applyWallpaper(dataUrl);
+    })
+    .catch(() => {
+      showWallpaperError("Could not read that image. Try another file.");
+    })
+    .finally(() => {
+      wallpaperUploadBtn.disabled = false;
+    });
+});
+
+updateWallpaperOptions();

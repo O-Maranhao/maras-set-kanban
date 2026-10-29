@@ -12,17 +12,29 @@
       document.documentElement.dataset.theme =
         saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     } catch {}
+
+    // Same for the saved wallpaper: a preset name or an uploaded image (data URL)
+    try {
+      const wallpaper = localStorage.getItem("maras-set-kanban-wallpaper");
+      if (wallpaper && wallpaper.startsWith("data:image/")) {
+        document.documentElement.style.setProperty("--wallpaper-custom", `url("${wallpaper}")`);
+        document.documentElement.dataset.wallpaper = "custom";
+      } else if (wallpaper) {
+        document.documentElement.dataset.wallpaper = wallpaper;
+      }
+    } catch {}
   </script>
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top bar: project title, theme toggle and button to add a new task -->
+  <!-- Top bar: project title, theme toggle, wallpaper picker and button to add a new task -->
   <header class="board-header">
     <h1>Maras-Set-Kanban</h1>
     <div class="header-actions">
       <button class="theme-toggle" type="button"></button>
+      <button class="wallpaper-toggle" type="button" aria-haspopup="dialog" aria-expanded="false">Wallpaper</button>
       <button class="new-task-btn">+ New Task</button>
     </div>
   </header>
@@ -51,6 +63,42 @@
         <button type="submit" class="task-form-submit">Add Task</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Wallpaper picker, hidden by default -->
+  <dialog class="wallpaper-dialog" aria-labelledby="wallpaper-dialog-title">
+    <h2 id="wallpaper-dialog-title">Wallpaper</h2>
+
+    <div class="wallpaper-options" role="group" aria-label="Wallpapers">
+      <button type="button" class="wallpaper-option" data-wallpaper="default" aria-pressed="false">
+        <span class="wallpaper-swatch"></span>Golden Gate
+      </button>
+      <button type="button" class="wallpaper-option" data-wallpaper="ocean" aria-pressed="false">
+        <span class="wallpaper-swatch"></span>Blue &amp; Yellow
+      </button>
+      <button type="button" class="wallpaper-option" data-wallpaper="sunset" aria-pressed="false">
+        <span class="wallpaper-swatch"></span>Sunset
+      </button>
+      <button type="button" class="wallpaper-option" data-wallpaper="forest" aria-pressed="false">
+        <span class="wallpaper-swatch"></span>Forest
+      </button>
+      <button type="button" class="wallpaper-option" data-wallpaper="graphite" aria-pressed="false">
+        <span class="wallpaper-swatch"></span>Graphite
+      </button>
+      <button type="button" class="wallpaper-option" data-wallpaper="custom" aria-pressed="false" hidden>
+        <span class="wallpaper-swatch"></span>Your image
+      </button>
+    </div>
+
+    <input type="file" class="wallpaper-file-input" accept="image/*" hidden>
+    <button type="button" class="wallpaper-upload-btn">Upload image</button>
+
+    <p class="wallpaper-error" role="alert" hidden></p>
+
+    <div class="wallpaper-actions">
+      <button type="button" class="wallpaper-reset-btn">Reset to default</button>
+      <button type="button" class="wallpaper-close-btn">Done</button>
+    </div>
   </dialog>
 
   <!-- MoSCoW filter -->
