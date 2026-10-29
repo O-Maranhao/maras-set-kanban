@@ -304,6 +304,7 @@ function placeDialog(left, top) {
 newTaskBtn.addEventListener("click", () => {
   editingTaskId = null;
   taskForm.reset();
+  dateInput.value = dateFromToday(0);
   dialogTitle.textContent = "New Task";
   taskFormSubmitBtn.textContent = "Add Task";
 
