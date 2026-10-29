@@ -969,3 +969,10 @@ html[data-wallpaper="custom"] { --wallpaper: var(--wallpaper-custom); }
     transform: none;
   }
 }
+
+/* Small phones: filter pills wrap onto a second row instead of scrolling the page */
+@media (max-width: 480px) {
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+}
