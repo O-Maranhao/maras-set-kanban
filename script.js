@@ -65,8 +65,11 @@ function loadTasks() {
   }
 }
 
+// A full or blocked storage must never break the board
 function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch {}
 }
 
 let tasks = loadTasks();
